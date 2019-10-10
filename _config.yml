@@ -214,7 +214,7 @@ font:
 #social:
   #LinkLabel: Link
 social:
-    GitHub: https://github.com/ShixiangWang
+    GitHub: https://github.com/Jadee
     简书: http://www.jianshu.com/u/b6608e27dc74
 # Social Links Icons
 # Icon Mapping:
@@ -268,8 +268,8 @@ sidebar:
   #  - hide    expand only when click on the sidebar toggle icon.
   #  - remove  Totally remove sidebar including sidebar toggle.
   #display: post
-  #display: always
-  display: hide
+  display: always
+  #display: hide
   #display: remove
 
   # Sidebar offset from top menubar in pixels.
