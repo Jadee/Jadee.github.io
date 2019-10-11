@@ -14,7 +14,7 @@ tags:
 
 # CNN 在 tensorboard 的展开图
 
-
+![avatar](/images/RL-learning/mdp-21.png)
 
 # 编写自定义cnn函数, 编程就像写诗一样
 ```python
