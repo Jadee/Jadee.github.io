@@ -178,11 +178,13 @@ Huffman树具有最短加权路径等良好性质。根据词库中词频可以�
 
 [7] NLP中的文本表示方法：<https://zhuanlan.zhihu.com/p/42310942>
 
-[8] <https://yq.aliyun.com/articles/176894>
+[8] word2vec详解：<https://zhuanlan.zhihu.com/p/42310942>
 
-[9] <https://blog.csdn.net/weixin_41843918/article/details/90312339>
+[9] <https://yq.aliyun.com/articles/176894>
 
-[10] <https://www.jianshu.com/p/1c73e01f9e5c>
+[10] <https://blog.csdn.net/weixin_41843918/article/details/90312339>
 
-[11] <https://www.jianshu.com/p/cdb93906607b>
+[11] <https://www.jianshu.com/p/1c73e01f9e5c>
+
+[12] <https://www.jianshu.com/p/cdb93906607b>
 
