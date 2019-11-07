@@ -65,45 +65,43 @@ $\overline{King} - \overline{Man} + \overline{Woman} = \overline{Queen}$
 
 模型的网络结构如下：
 
-![avatar](https://img-blog.csdn.net/20171205202107851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDY2NTIxNg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![avatar](https://img-blog.csdn.net/20171122185816199?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZ2l0aHViXzM2MjM1MzQx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 V是词库大小，N为隐藏层维度，C是上下文词数量。
 
 这里输入层是由one-hot编码的输入上下文 ${x_1，x_2，\ldots，x_C}$ 组成，最后输出层是也被one-hot编码的输出单词 $y$。被one-hot编码的输入向量通过一个$V * N$ 维的权重矩阵 $W$ 连接到隐藏层；隐藏层通过一个 $N * V$ 的权重矩阵 $W′$ 连接到输出层。
 
-* **input**：context的one-hot向量 ${x_1，x_2，\ldots，x_C}$
+* **input**：context的one-hot向量 $\{x_1，x_2，\ldots，x_C\}$
 
-* **input -> hidden**
-
-&emsp;context词的平均向量 x 权重矩阵
+* **input -> hidden**：context词的平均向量 x 权重矩阵
 
 $$ h = \frac{1}{C} W * (\sum_{i = 1}^C x_i) $$ 
 
-&emsp;该输出就是输入向量的加权平均
+&emsp;&emsp;该输出就是输入向量的加权平均
 
 * **hidden-> output**
 
-&emsp;1. 为每一个词库中的词计算得到一个分数
+&emsp;&emsp;1. 为每一个词库中的词计算得到一个分数
 
 $$ u_j = v_{wj}^{'T} * h $$
 
-&emsp;其中 $v_{wj}^{'T}$ 是输出矩阵 $W'$ 的第 $j$ 列。
+&emsp;&emsp;&emsp;其中 $v_{wj}^{'T}$ 是输出矩阵 $W'$ 的第 $j$ 列。
 
-&emsp;2. 使用softmax多分类模型，计算出输出每一个词的概率 $y_i$：
+&emsp;&emsp;2. 使用softmax多分类模型，计算出输出每一个词的概率 $y_i$：
 
-$$ y_{c,j} = p(w_{y,j}\|w_1，w_2，\ldots，w_c) = \frac{exp(u_j)}{\sum_{j' = 1}{V} u_{j'}} $$ 
+$$ y_{c,j} = p(w_{y,j}|w_1，w_2，\ldots，w_c) = \frac{exp(u_j)}{\sum_{j' = 1}^{V} u_{j'}} $$ 
 
-训练的目标是最大化实际输出词索引位置 $j*$ 的条件概率 $y_{j*}$，进一步得到模型的loss function，首先就是定义损失函数，这个损失函数就是给定输入上下文的输出单词的条件概率，一般都是取对数，如下所示：
+训练的目标是最大化实际输出词索引位置 $j\*$ 的条件概率 $y_{j\*}$，进一步得到模型的loss function，首先就是定义损失函数，这个损失函数就是给定输入上下文的输出单词的条件概率，一般都是取对数，如下所示：
 
-$$ E = -logp(w_O \| w_I) = - v_{wo}^T * h - log \sum_{j' = 1}{V} exp(v_{wj'}^T * h)$$
+$$ E = -logp(w_O | w_I) = - v_{wo}^T * h - log \sum_{j' = 1}^{V} exp(v_{wj'}^T * h)$$
 
 使用梯度上升的方式更新参数，推导过程省略，得到输出权重矩阵 $W'$ 的更新规则：
 
-$$ w'^{new} = w'^{new}_{ij} - \eta * {y_j - t_j} * h_i$$
+$$ w'^{new} = w'^{old}_{ij} - \eta * {y_j - t_j} * h_i$$
 
 同理权重 $W$ 的更新规则如下：
 
-$$ w^{new} = w^{new}_{ij} - \eta * \frac{1}{C} * EH $$
+$$ w^{new} = w^{old}_{ij} - \eta * \frac{1}{C} * EH $$
 
 ### Skip-gram
 
@@ -113,16 +111,33 @@ skip-gram模型则与CBOW相反，是用中心词预测周围词。利用周围�
 
 ![avatar](https://img-blog.csdn.net/20171205144115314?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDY2NTIxNg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
-* **input**：中心词的one-hot向量 ${x_1，x_2，\ldots，x_C}$
+* **input**：中心词的one-hot向量 $\{x_1，x_2，\ldots，x_C\}$
 
 * **input -> hidden**
 
-$$ h = x^T W =  $$
+$$ h = x^T W = W_{k,.} := v_{wI} $$
 
 * **hidden-> output**
 
-&emsp;C个多分类问题，共享一个参数矩阵
+&emsp;&emsp;C个多分类问题，共享一个参数矩阵
 
+$$ p(w_{c,j} = w_{O,c} | w_{I}) = y_{c,j} = \frac{exp(u_{c,j})}{\sum_{j'=1}^V exp(u_{j'})} $$
+
+&emsp;&emsp;计算得到每个词的分数：
+
+$$ u_{c,j} = u_j = v'_{wj}^T * h，\quad for \quad c = 1，2，\cdots，C $$
+
+此时训练目标为最大化c个输出中实际词所在索引位置的预测概率，loss function 如下：
+
+$$ E = -log p(w_{O,1},w_{O,2},\cdots,w_{O,C}) = - log \prod_{c=1}^C \frac{exp(u_{c,j})}{\sum_{j'=1}^V exp(u_{j'})} $$
+
+使用梯度上升的方式更新参数，推导过程省略，得到输出权重矩阵 $W'$ 的更新规则：
+
+$$ w'^{new} = w'^{old}_{ij} - \eta * \sum_{c=1}^C (y_{c,j} - t_{c,j}) * h_i$$
+
+同理权重 $W$ 的更新规则如下：
+
+$$ w^{new} = w^{old}_{ij} - \eta * \sum_{j=1}^V \sum_{c=1}^C (y_{c,j} - t_{c,j}) * w'_{ij} * x_j $$
 
 可以看出，不管是CBOW还是skip-gram，都要预测词库中所有词的概率，计算复杂度很高。此外，skip-gram预测的次数是要多于CBOW的，每个词在作为中心词的时候，都要进行C次的预测、调整。
 
@@ -132,6 +147,36 @@ $$ h = x^T W =  $$
 
 上面介绍的CBOW和skip-gram模型都是原始的模型结构，不计工程代价且没有做任何效率优化的工作。可以看出，为了更新词向量，对于每一条样本，都要预测词库中每一个词的概率，并利用预测误差更新参数和词向量。为了提高计算效率，一个直观的想法就是限制每次更新向量的数量。下面将介绍word2vec模型，主要通过两种方法对传统模型进行改进：一种比较优雅，利用树结构达到分层softmax；另一种是通过采样的方法。
 
-word2vec模型对从input层到hidden层的映射关系进行了简化。在skip-gram中，，隐藏层输出为输入中心词向量；在CBOW中，，隐藏层输出为上下文向量取均值。
+word2vec模型对从input层到hidden层的映射关系进行了简化。在skip-gram中，$h = v_{wI}$，隐藏层输出为输入中心词向量；在CBOW中，$h = \frac{1}{C}\sum_{c=1}^C v_{w_c}$，隐藏层输出为上下文向量取均值。
 
+
+### Hierarchical Softmax
+
+**Huffman树**
+
+Huffman树具有最短加权路径等良好性质。根据词库中词频可以构建一个Huffman树，这样词频越高的词，路径最短。
+
+模型结构.
+
+分层Softmax使用Huffman树代替隐藏层和输出层的神经元，将原output层 V 个词映射为叶子节点，这样每个词都可以从根节点通过某个特定路径到达叶子节点。即在每层进行决策的时候可以看作是一个二分类问题，即Hierarchical Softmax名字的由来。
+
+词w作为输出词的概率定义为：
+
+# Reference
+
+[1] Distributed Representations of Words and Phrases and their Compositionality.pdf
+
+[2] Efficient Estimation of Word Representations in Vector Space.pdf
+
+[3] word2vec Parameter Learning Explained.pdf
+
+[4] microsoft 2016 ITEM2VEC- NEURAL ITEM EMBEDDING FOR COLLABORATIVE FILTERING .pdf
+
+[5] airbnb 2018 Real-time Personalization using Embeddings for Search Ranking at Airbnb.pdf
+
+[6] <https://yq.aliyun.com/articles/176894>
+
+[7] <https://blog.csdn.net/weixin_41843918/article/details/90312339>
+
+[8] <https://www.jianshu.com/p/1c73e01f9e5c>
 
