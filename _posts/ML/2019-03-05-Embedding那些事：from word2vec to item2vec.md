@@ -52,7 +52,7 @@ child = (0.01,0.2,0.4,0.3,0.2)
 
 Distributed representation方法可以解决one-hot的问题，通过训练，将词映射成较低维向量。而大部分情况下词向量的各个维度并不能很好地解释，可以理解为隐含特征。有了词向量，我们便可以很好描述词，挖掘词之间的关系了。有一个有趣的研究表明：
 
-$\overline{King} - \overline{Man} + \overline{Woman} = \overline{Queen}$
+$\overrightarrow{King} - \overrightarrow{Man} + \overrightarrow{Woman} = \overrightarrow{Queen}$
 
 从直观含义上，不难理解。
 
@@ -161,6 +161,76 @@ Huffman树具有最短加权路径等良好性质。根据词库中词频可以�
 分层Softmax使用Huffman树代替隐藏层和输出层的神经元，将原output层 V 个词映射为叶子节点，这样每个词都可以从根节点通过某个特定路径到达叶子节点。即在每层进行决策的时候可以看作是一个二分类问题，即Hierarchical Softmax名字的由来。
 
 词w作为输出词的概率定义为：
+
+下面是一个树结构的示例：
+
+![avatar](https://pic4.zhimg.com/80/v2-758cbf836d38e953700fbece2e62dd4b_hd.jpg)
+
+以图中二叉树为例，要想计算输出词为 $w_2$ 的概率。在每个节点，需要选择是向左走还是向右走。
+
+定义向左的概率：$p(n，left) = \sigma(v_n^{'T} \cdot h)$ 
+
+则向右的概率为：$p(n，right) = 1- \sigma(v_n^{'T} \cdot h) = \sigma(-v_n^{'T} \cdot h)$ 
+
+因此，从根节点到 $w_2$ 的概率可计算为：
+
+$$ \begin{align} p(w_2 = w_o) &= p(n(w_2，1)，left) \cdot p(n(w_2，2)，left) \cdot p(n(w_2，3)，right) \\
+    & = \sigma(v_{n(w_2,1)}^{'T} \cdot h) \cdot \sigma(v_{n(w_2,2)}^{'T} \cdot h) \cdot \sigma(-v_{n(w_2,3)}^{'T} \cdot h)
+   \end{align}
+$$
+
+loss function可以定义为：
+
+$$ E = -log p(w = w_o | w_I) = - \sum_{j = 1}^{L(w) - 1} log \sigma([\cdot] v_n^{'T} \cdot h)$$
+
+同样，使用随机梯度上升的方法更新参数和向量。
+
+通过这种方法，我们可以看出，对于每条样本，我们计算复杂度由O(V)变为O(logV)，大大提高了计算效率。
+
+### Negative Sampling
+
+分层softmax存在一些缺点。如果训练样本的中心词是一个生僻词，那么它的路径将会变得很长，需要计算的节点变多。
+
+Negative Sampling利用一种更直接的方式减少计算量 —— 采样。负采样顾名思义，是对负样本进行采样，为了避免每一轮迭代更新太多的向量，我们可以选择只更新其中一部分。输出词作为正样本，对剩下的词采样部分作为负样本。loss function定义如下：
+
+$$ E = -log \sigma(v_n^{'T} \cdot h) - \sum_{w_j \in W_neg} log \sigma(-v_{w_j}^{'T} \cdot h)$$
+
+其中，$W_neg$ 为采样对负样本集合。同样使用随机梯度上升的方法更新参数和向量。
+
+**采样方法**
+
+如何进行负采样呢？一个直观的想法是均匀采样，即每个词以同样的概率被采样作为负样本。这种采样方式未考虑词频带来的影响，每个词被平等看待。而往往词库中会存在很多高频词，例如the、a等，这些高频词在词库中出现的频率高，与其他词共现的次数多，但很显然包含信息量少且相关性不高。高频词与其他词的共现概率高，在多轮更新迭代后，词向量会趋于稳定。为了平衡高频词带来的影响，通常使用的采样方法为：
+
+$$ p(w_i) = 1 - \sqrt{\frac{t}{f(w_i)}}$$
+
+其中，$f(w_i)$ 为词 $w_i$ 出现的频率，t为指定的阈值（通常10^-5左右）。那么可以看出，出现频率越高的词越容易被选作负样本，从一定程度上打压了高频词对中心词的影响。
+
+通过负采样的方式，不仅能够加速迭代学习，对生僻词的表示也更准确。
+
+# Item Embedding
+
+## item2vec Microsoft
+```
+ITEM2VEC: NEURAL ITEM EMBEDDING FOR COLLABORATIVE FILTERING
+```
+
+这篇论文是微软将word2vec应用于推荐领域的一篇实用性很强的文章。该文的方法简单易用，可以说极大拓展了word2vec的应用范围，使其从NLP领域直接扩展到推荐、广告、搜索等任何可以生成sequence的领域。
+
+### SKip-gram with negative sampling
+
+目标函数：
+
+$$ \frac{1}{K} \sum_{i=1}^K \sum_{-c \leq j \leq c，j \neq 0} log \quad p(w_{i+j}|w_i) $$
+
+其中：
+
+$$ p(w_j | w_i) = \sigma(u_i^T v_j) \prod_{k=1}^N \sigma(-u_i^T v_k) $$
+
+$$ \sigma(x) = \frac{1}{1 + exp(-x)} $$
+
+为了平衡生僻词和常用词，对样本进行二次采样，以一定概率丢弃样本
+
+
 
 # Reference
 
