@@ -52,9 +52,86 @@ child = (0.01,0.2,0.4,0.3,0.2)
 
 Distributed representation方法可以解决one-hot的问题，通过训练，将词映射成较低维向量。而大部分情况下词向量的各个维度并不能很好地解释，可以理解为隐含特征。有了词向量，我们便可以很好描述词，挖掘词之间的关系了。有一个有趣的研究表明：
 
-$\rightarrow{King} - \rightarrow{Man} + \rightarrow{Woman} = \rightarrow{Queen}$
+$\overline{King} - \overline{Man} + \overline{Woman} = \overline{Queen}$
 
 从直观含义上，不难理解。
 
 那么，如何训练得到word embedding向量呢？  
 一种很常见的方法，使用神经网络模型。常用的两种模型结构介绍如下。
+
+### CBOW（Continuous Bag-of-Word Model）
+
+用一句话描述CBOW模型的原理：用周围词预测中心词。利用中心词的预测结果，不断更新周围词的词向量。
+
+模型的网络结构如下：
+
+![avatar](https://img-blog.csdn.net/20171205202107851?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDY2NTIxNg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+V是词库大小，N为隐藏层维度，C是上下文词数量。
+
+这里输入层是由one-hot编码的输入上下文 ${x_1，x_2，\ldots，x_C}$ 组成，最后输出层是也被one-hot编码的输出单词 $y$。被one-hot编码的输入向量通过一个$V * N$ 维的权重矩阵 $W$ 连接到隐藏层；隐藏层通过一个 $N * V$ 的权重矩阵 $W′$ 连接到输出层。
+
+* **input**：context的one-hot向量 ${x_1，x_2，\ldots，x_C}$
+
+* **input -> hidden**
+
+&emsp;context词的平均向量 x 权重矩阵
+
+$$ h = \frac{1}{C} W * (\sum_{i = 1}^C x_i) $$ 
+
+&emsp;该输出就是输入向量的加权平均
+
+* **hidden-> output**
+
+&emsp;1. 为每一个词库中的词计算得到一个分数
+
+$$ u_j = v_{wj}^{'T} * h $$
+
+&emsp;其中 $v_{wj}^{'T}$ 是输出矩阵 $W'$ 的第 $j$ 列。
+
+&emsp;2. 使用softmax多分类模型，计算出输出每一个词的概率 $y_i$：
+
+$$ y_{c,j} = p(w_{y,j}\|w_1，w_2，\ldots，w_c) = \frac{exp(u_j)}{\sum_{j' = 1}{V} u_{j'}} $$ 
+
+训练的目标是最大化实际输出词索引位置 $j*$ 的条件概率 $y_{j*}$，进一步得到模型的loss function，首先就是定义损失函数，这个损失函数就是给定输入上下文的输出单词的条件概率，一般都是取对数，如下所示：
+
+$$ E = -logp(w_O \| w_I) = - v_{wo}^T * h - log \sum_{j' = 1}{V} exp(v_{wj'}^T * h)$$
+
+使用梯度上升的方式更新参数，推导过程省略，得到输出权重矩阵 $W'$ 的更新规则：
+
+$$ w'^{new} = w'^{new}_{ij} - \eta * {y_j - t_j} * h_i$$
+
+同理权重 $W$ 的更新规则如下：
+
+$$ w^{new} = w^{new}_{ij} - \eta * \frac{1}{C} * EH $$
+
+### Skip-gram
+
+skip-gram模型则与CBOW相反，是用中心词预测周围词。利用周围词的预测结果，不断更新调整中心词向量。
+
+模型网络结构如下：
+
+![avatar](https://img-blog.csdn.net/20171205144115314?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDY2NTIxNg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+* **input**：中心词的one-hot向量 ${x_1，x_2，\ldots，x_C}$
+
+* **input -> hidden**
+
+$$ h = x^T W =  $$
+
+* **hidden-> output**
+
+&emsp;C个多分类问题，共享一个参数矩阵
+
+
+可以看出，不管是CBOW还是skip-gram，都要预测词库中所有词的概率，计算复杂度很高。此外，skip-gram预测的次数是要多于CBOW的，每个词在作为中心词的时候，都要进行C次的预测、调整。
+
+借鉴他人的比喻来形象描述一下二者的区别：在skip-gram模型里，每个词在作为中心词的时候，相当于1个学生（中心词）和C个老师（上下文）。C个老师都会对学生进行“专业”训练，结果就是学生的能力会更强一些，但是这样对于学生而言每个老师都要进行一对一指导，肯定会使用更长的时间；而CBOW则是C个学生和1个老师，C个学生（上下文）都会从老师（中心词）这里学到知识，但是老师是“广播”知识，教给大家的知识是相同的。除此之外，学生还会从别的老师的课堂中和大家一起学到相同的知识（还会成为别的中心词的上下文），这样效率更高，速度更快。
+
+## word2vec 
+
+上面介绍的CBOW和skip-gram模型都是原始的模型结构，不计工程代价且没有做任何效率优化的工作。可以看出，为了更新词向量，对于每一条样本，都要预测词库中每一个词的概率，并利用预测误差更新参数和词向量。为了提高计算效率，一个直观的想法就是限制每次更新向量的数量。下面将介绍word2vec模型，主要通过两种方法对传统模型进行改进：一种比较优雅，利用树结构达到分层softmax；另一种是通过采样的方法。
+
+word2vec模型对从input层到hidden层的映射关系进行了简化。在skip-gram中，，隐藏层输出为输入中心词向量；在CBOW中，，隐藏层输出为上下文向量取均值。
+
+
