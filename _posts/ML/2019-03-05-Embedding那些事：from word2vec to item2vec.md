@@ -109,7 +109,7 @@ skip-gram模型则与CBOW相反，是用中心词预测周围词。利用周围�
 
 模型网络结构如下：
 
-![avatar](https://img-blog.csdn.net/20171205144115314?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDY2NTIxNg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![avatar](https://pic4.zhimg.com/80/v2-6f1787c54370882fd1125d5defb937e7_hd.jpg)
 
 * **input**：中心词的one-hot向量 $\{x_1，x_2，\ldots，x_C\}$
 
@@ -174,9 +174,15 @@ Huffman树具有最短加权路径等良好性质。根据词库中词频可以�
 
 [5] airbnb 2018 Real-time Personalization using Embeddings for Search Ranking at Airbnb.pdf
 
-[6] <https://yq.aliyun.com/articles/176894>
+[6] [word2vec原理推导与代码分析](http://www.hankcs.com/nlp/word2vec.html#h3-5)
 
-[7] <https://blog.csdn.net/weixin_41843918/article/details/90312339>
+[7] NLP中的文本表示方法：<https://zhuanlan.zhihu.com/p/42310942>
 
-[8] <https://www.jianshu.com/p/1c73e01f9e5c>
+[8] <https://yq.aliyun.com/articles/176894>
+
+[9] <https://blog.csdn.net/weixin_41843918/article/details/90312339>
+
+[10] <https://www.jianshu.com/p/1c73e01f9e5c>
+
+[11] <https://www.jianshu.com/p/cdb93906607b>
 
