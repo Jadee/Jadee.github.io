@@ -216,20 +216,49 @@ ITEM2VEC: NEURAL ITEM EMBEDDING FOR COLLABORATIVE FILTERING
 
 这篇论文是微软将word2vec应用于推荐领域的一篇实用性很强的文章。该文的方法简单易用，可以说极大拓展了word2vec的应用范围，使其从NLP领域直接扩展到推荐、广告、搜索等任何可以生成sequence的领域。
 
-### SKip-gram with negative sampling
+[论文研读一：知乎专栏](https://zhuanlan.zhihu.com/p/24339183)
 
-目标函数：
+[论文研读二](https://www.cnblogs.com/bentuwuying/p/8271262.html)
 
-$$ \frac{1}{K} \sum_{i=1}^K \sum_{-c \leq j \leq c，j \neq 0} log \quad p(w_{i+j}|w_i) $$
 
-其中：
+## item2vec Airbnb
+```
+Real-time Personalization using Embeddings for Search Ranking at Airbnb
+```
 
-$$ p(w_j | w_i) = \sigma(u_i^T v_j) \prod_{k=1}^N \sigma(-u_i^T v_k) $$
+Airbnb的这篇论文是KDD 2018的best paper。我们知道，airbnb是全世界最大的短租网站。在平台上，房东(host)可以向用户(user)提供房源(listing)，用户可以通过输入地点、价位等关键词搜索相关的房源信息，并做浏览选择。user和host的交互行为分成三种：user点击／预定listing，host拒绝预定。基于这样的业务背景，本文提出了两种embedding的方法分别去capture用户的短期兴趣和长期兴趣。利用用户click session和booking session序列，训练生成listing embedding 和 user-type&listing-tpye embedding，并将embedding特征输入到搜索场景下的rank模型，提升模型效果。
 
-$$ \sigma(x) = \frac{1}{1 + exp(-x)} $$
+[论文研读一](https://blog.csdn.net/like_red/article/details/88389918)
 
-为了平衡生僻词和常用词，对样本进行二次采样，以一定概率丢弃样本
+[论文研读二](https://blog.csdn.net/sxf1061926959/article/details/87903586)
 
+[论文研读三：知乎专栏](https://zhuanlan.zhihu.com/p/43295545)
+
+[论文研读四：知乎专栏](https://zhuanlan.zhihu.com/p/55149901)
+
+### Listing Embedding
+
+**数据**
+
+利用用户的click session，定义点击listing序列，并基于此序列训练出listing embedding。
+
+click session定义：用户在一次搜索中点击的listing序列。序列生成有两个限制条件：1) 停留时间超过30s，点击有效 2) 用户点击间隔时间超过30min，记为新序列
+
+此外，文中还提到了listing embedding冷启动问题的解决方法。平台每天都有新房源登记，房东登记房源往往会提供房源的地点、价格等基本信息，取附近的3个同样类型、相似价格的listing embedding平均值生成该房源的embedding，用这种方法可以覆盖98%新房源，不失为一个实用的工程经验。
+
+### User-type & Listing-type Embedding
+
+点击行为可以反映用户的实时需求，但往往无法捕捉用户长期兴趣偏好。使用booking session序列来捕捉用户长期兴趣，但是这里会遇到严重的数据稀疏问题。
+
+**数据**
+
+booking session的数据稀疏问题
+
+* book行为的数量远远小于click的行为  
+* 单一用户的book行为很少，大量用户在过去一年甚至只book过一个房源  
+* 大部分listing被book的次数较少
+
+如何解决这些问题？利用User-type&Listing-type进行聚合。
 
 
 # Reference
