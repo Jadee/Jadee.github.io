@@ -169,7 +169,7 @@ with tf.Session() as sess:
 
 用了最简单的线性模型，我们换成经典的神经网络来实现这个功能。神经网络的图如下图所示。
 
-![avatar](http://www.kongzhi.net/uploads/images/cases/2007/9/1190777620.gif)
+![avatar](http://n.sinaimg.cn/transform/20151109/NdCg-fxkniur2999059.jpg)
 
 我们还是不管三七二十一，建立一个隐藏层，用最传统的sigmoid函数做激活函数。其核心逻辑还是矩阵乘法，这里面没有任何技巧。
 ```
