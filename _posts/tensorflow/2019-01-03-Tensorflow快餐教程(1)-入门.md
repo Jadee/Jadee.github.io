@@ -122,7 +122,7 @@ with tf.Session() as sess:
 
 线性回归不过瘾，我们直接一步到位，开始进行手写识别。
 
-[!avatar](https://ask.qcloudimg.com/http-save/yehe-1205621/zqk26vr3zx.jpeg?imageView2/2/w/1620)
+![avatar](https://ask.qcloudimg.com/http-save/yehe-1205621/zqk26vr3zx.jpeg?imageView2/2/w/1620)
 
 我们采用深度学习三巨头之一的Yann Lecun教授的MNIST数据为例。如上图所示，MNIST的数据是28x28的图像，并且标记了它的值应该是什么。
 
@@ -169,7 +169,7 @@ with tf.Session() as sess:
 
 用了最简单的线性模型，我们换成经典的神经网络来实现这个功能。神经网络的图如下图所示。
 
-[!avatar](http://www.kongzhi.net/uploads/images/cases/2007/9/1190777620.gif)
+![avatar](http://www.kongzhi.net/uploads/images/cases/2007/9/1190777620.gif)
 
 我们还是不管三七二十一，建立一个隐藏层，用最传统的sigmoid函数做激活函数。其核心逻辑还是矩阵乘法，这里面没有任何技巧。
 ```
