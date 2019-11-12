@@ -99,11 +99,5 @@ $$ \||x\||_p=(\displaystyle{\sum_i}|x_i|^p)^{\frac{1}{p}} $$
   1. 非负性：$\|A\| \geq 0$  
   2. 正定性：$A=O_{m\times{n}} \Leftrightarrow \|A\|=0$  
   3. 齐次性：$\|\alpha{A}\| = |\alpha|\|A\|，\alpha\in{}C$  
-  4. 三角不等式: $\|A+B\|\le\|A\|\|B\|，\forall{}B\in{C^{m\times{n}}}$，则称 $N(A) = \|A\|$ 为A的广义矩阵范数。进一步，若对 $C^{m\times{n}},C^{n\times{l}},C^{m\times{l}}$ 上的同类广义矩阵范数
-∥
-⋅
-∥
-，有下面的结论
-
-
-
+  4. 三角不等式: $\|A+B\|\le\|A\|\|B\|，\forall{}B\in{C^{m\times{n}}}$，则称 $N(A) = \|A\|$ 为A的广义矩阵范数。进一步，若对 $C^{m\times{n}},C^{n\times{l}},C^{m\times{l}}$ 上的同类广义矩阵范数 $\|\cdot\|$，有下面的结论  
+  5. 矩阵乘法的）相容性：$\|AB\|\le{}\|A\|\|B\|, B\in{}C^{n\times{l}}$，则称 $N(A) = \|A\|$ 为A的矩阵范数。
