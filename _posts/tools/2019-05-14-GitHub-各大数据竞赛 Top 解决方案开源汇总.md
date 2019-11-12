@@ -251,7 +251,7 @@ Via：<https://github.com/Smilexuhc/Data-Competition-TopSolution>
 
 # Reference
 
-* [**2018 年度 GtiHub 开源项目 TOP 25：数据科学 & 机器学习**](https://mbd.baidu.com/newspage/data/landingsuper?context=%7B%22nid%22%3A%22news_9051843751691689624%22%7D&n_type=0&p_from=1)
+* [**2018 年度 GtiHub 开源项目 TOP 25：数据科学 & 机器学习**](https://www.leiphone.com/news/201901/G09wwNYYejYbEvgM.html)
 
 * [**Google、亚马逊、微软 、阿里巴巴开源软件一览**](https://mp.weixin.qq.com/s/SGcrUAeGJRShgL9xT7m5QA?spm=ata.13261165.0.0.e65943b9K4tpac)
 
