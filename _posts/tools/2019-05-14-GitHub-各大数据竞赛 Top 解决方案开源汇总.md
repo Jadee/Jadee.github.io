@@ -248,3 +248,11 @@ Rank1：<https://zhuanlan.zhihu.com/p/47807544>
 * 《Ask Me Anything session with a Kaggle Grandmaster Vladimir I. Iglovikov》PDF：<https://pan.baidu.com/s/1XkFwko_YrI5TfjjIai7ONQ>
 
 Via：<https://github.com/Smilexuhc/Data-Competition-TopSolution>
+
+# Reference
+
+* [**2018 年度 GtiHub 开源项目 TOP 25：数据科学 & 机器学习**](https://mbd.baidu.com/newspage/data/landingsuper?context=%7B%22nid%22%3A%22news_9051843751691689624%22%7D&n_type=0&p_from=1)
+
+* [**Google、亚马逊、微软 、阿里巴巴开源软件一览**](https://mp.weixin.qq.com/s/SGcrUAeGJRShgL9xT7m5QA?spm=ata.13261165.0.0.e65943b9K4tpac)
+
+* [**Facebook、微信团队、Twitter、微软开源软件列表一览**](https://mp.weixin.qq.com/s/HzuGFCIgwl-MIWfabQAAuQ?spm=ata.13261165.0.0.e65943b9K4tpac)
