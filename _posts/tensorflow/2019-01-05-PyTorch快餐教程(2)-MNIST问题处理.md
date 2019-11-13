@@ -1,9 +1,9 @@
 ---
 title: PyTorch快餐教程(2)-MNIST问题处理
 date: 2019-01-05
-categories: Tensorflow
+categories: PyTorch
 tags:
-- Tensorflow
+- PyTorch
 ---
 
 # 背景简介
