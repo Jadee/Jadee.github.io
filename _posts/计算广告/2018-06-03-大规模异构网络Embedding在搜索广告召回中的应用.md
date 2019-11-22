@@ -27,13 +27,13 @@ tags:
 4) 向量距离敏感。在以往的Network Embedding工作中，节点向量往往是作为后续任务的特征使用。而在搜索广告召回场景，我们直接使用向量的距离进行召回和排序。因此，节点向量需要能够有效地反映意图节点和ad节点之间的相关性。  
 5) 节点属性。除了节点ID，还存在着丰富的节点属性信息，如item的价格、品牌等。这些节点属性信息是很好的泛化特征，能够帮助我们更好的理解任务场景。
 
-![avatar]((/images/计算广告/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-1.png)
 
 为了解决上述挑战，提出了一种针对搜索广告召回的大规模异构网络Embedding方法，并通过Embedding得到的节点向量，进行广告召回。如图1所示，整个系统包括异构图构建、样本生成、模型训练、ANN检索等步骤。
 
 # 异构图构建
 
-![avatar](/images/计算广告/trigger/trigger-2.png)
+![avatar](/images/trigger/trigger-2.png)
 
 首先，我们为搜索场景构造一张大规模异构图。如图2所示，图中包含query、item、ad等多种类型节点，表示搜索场景中不同的实体：
 
@@ -76,17 +76,17 @@ $$ v_1 -> v_2 -> \cdots -> v_{\tau}$$
 
 # 模型训练
 
-![avatar](/images/计算广告/trigger/trigger-3.png)
+![avatar](/images/trigger/trigger-3.png)
 
 ## Relevance目标
 
 给定异构图 $G = (V_p, \\: E_Q)$，包含了P种节点和Q种边。对于第 p 种类型的源节点 $v \in V_p$ 和第 q 种类型的边 $e \in E_q$，我们学习出一个DNN网络 $f_{pq}^{src}$：
 
-![avatar](/images/计算广告/trigger/trigger-4.png)
+![avatar](/images/trigger/trigger-4.png)
 
 为了保证同一个节点通过不同类型的边Embedding得到的向量能够映射到同一低维空间，我们让所有目标节点（即正节点和负节点）在所有类型的边关系中，共享相同的DNN网络 $f_{p}^{dst}$：
 
-![avatar](/images/计算广告/trigger/trigger-5.png)
+![avatar](/images/trigger/trigger-5.png)
 
 因此，我们同时协同地学习 $P * Q + P$ 个DNN网络。其中 $P*Q$ 个网络用来Embedding源节点，P个网络用来Embedding目标节点。
 
@@ -120,7 +120,7 @@ $$ R_q^{att}(v, v') = \eta Cos( g_{p}^{att}(v), \: \:  f_{p'}^{dst}(v'))$$
 
 综合 $O_{rel}$ 和 $O_{att}$，算法伪码如下：
 
-![avatar](/images/计算广告/trigger/trigger-6.png)
+![avatar](/images/trigger/trigger-6.png)
 
 # ANN检索
 
@@ -128,7 +128,7 @@ $$ R_q^{att}(v, v') = \eta Cos( g_{p}^{att}(v), \: \:  f_{p'}^{dst}(v'))$$
 
 # 效果展示
 
-![avatar](/images/计算广告/trigger/trigger-7.png)
+![avatar](/images/trigger/trigger-7.png)
 
 如图所示，我们使用t-SNE对节点向量进行可视化。可以看到，相似的节点在低维空间上很好地进行了聚集；而且不同种类的节点也确实被投影到同一空间。
 
