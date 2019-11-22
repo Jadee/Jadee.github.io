@@ -27,13 +27,13 @@ tags:
 4) 向量距离敏感。在以往的Network Embedding工作中，节点向量往往是作为后续任务的特征使用。而在搜索广告召回场景，我们直接使用向量的距离进行召回和排序。因此，节点向量需要能够有效地反映意图节点和ad节点之间的相关性。  
 5) 节点属性。除了节点ID，还存在着丰富的节点属性信息，如item的价格、品牌等。这些节点属性信息是很好的泛化特征，能够帮助我们更好的理解任务场景。
 
-![avatar](/images/计算广告/ad-34.png)
+![avatar](/images/计算广告/trigger/trigger-1.png)
 
 为了解决上述挑战，提出了一种针对搜索广告召回的大规模异构网络Embedding方法，并通过Embedding得到的节点向量，进行广告召回。如图1所示，整个系统包括异构图构建、样本生成、模型训练、ANN检索等步骤。
 
 # 异构图构建
 
-![avatar](/images/计算广告/ad-34.png)
+![avatar](/images/计算广告/trigger/trigger-2.png)
 
 首先，我们为搜索场景构造一张大规模异构图。如图2所示，图中包含query、item、ad等多种类型节点，表示搜索场景中不同的实体：
 
@@ -76,21 +76,61 @@ $$ v_1 -> v_2 -> \cdots -> v_{\tau}$$
 
 # 模型训练
 
-![avatar](/images/计算广告/ad-34.png)
+![avatar](/images/计算广告/trigger/trigger-3.png)
 
 ## Relevance目标
 
 给定异构图 $G = (V_p, \\: E_Q)$，包含了P种节点和Q种边。对于第 p 种类型的源节点 $v \in V_p$ 和第 q 种类型的边 $e \in E_q$，我们学习出一个DNN网络 $f_{pq}^{src}$：
 
-![avatar](/images/计算广告/ad-34.png)
+![avatar](/images/计算广告/trigger/trigger-4.png)
 
 为了保证同一个节点通过不同类型的边Embedding得到的向量能够映射到同一低维空间，我们让所有目标节点（即正节点和负节点）在所有类型的边关系中，共享相同的DNN网络 $f_{p}^{dst}$：
 
-![avatar](/images/计算广告/ad-35.png)
+![avatar](/images/计算广告/trigger/trigger-5.png)
 
 因此，我们同时协同地学习 $P * Q + P$ 个DNN网络。其中 $P*Q$ 个网络用来Embedding源节点，P个网络用来Embedding目标节点。
 
 给定第q种类型的边，$v \in V_p$ 表示源节点，$v' \in V_p^{'}$ 表示正节点，$v^{''} \subseteq V_p^{'}$ 表示负节点。我们使用Cosine距离刻画节点之间的相似性，并使用Softmax交叉熵Loss作为Relevance目标 $O_{rel}$：
+
+$$ O_{rel} = - \frac{1}{N} \sum_n log(P_q^{rel}(v|v')) $$
+
+$$ P_q^{rel}(v|v') = \frac{exp(R_q^{rel}(v, v'))}{exp(R_q^{rel}(v, v')) + \sum_{v^{''}} exp(R_q^{rel}(v, v^{''})) } $$
+
+$$ R_q^{rel}(v, v') = \eta Cos( f_{pq}^{src}(v), \: \:  f_{p'}^{dst}(v'))$$
+
+# Attention目标
+
+对于一个源节点 $v \in V_p$，我们可以通过每种类型的边得到Q个低维向量 $ \{ f_{pq}^{src} \}_{Q} $ 。我们通过Attention机制，自动学习每个向量的权重，把Q个向量合并成一个向量 $g_p^{att}$：
+
+$$ \lambda^{pq} = \frac{exp(z_{pq} \cdot f_{pq}^{src}(v) ) }{  \sum_{q'}  exp( z_{pq'} \cdot f_{pq'}^{src}(v)   )  }$$ 
+
+$$ g_p^{att}(v) = \sum_q \lambda^{pq} f_{pq}^{src}(v) $$
+
+其中 $\lambda^{pq}(v)$ 表示第p种类型的节点v在第q种类型边上的权重。如果 $z_{pq}$ 和 $f_{pq}^{src}(v)$ 的内积较大，则表明 v 认为第 q 种边是有信息的。此外，如果两个节点有着类似的向量，表明它们在图中关系亲密，会有着相似的权重分布。
+
+我们同样使用Cosine距离和Softmax交叉熵Loss作为Attention目标 $O_{att}$：
+
+$$ O_{att} = - \frac{1}{N} \sum_n log(P_q^{att}(v|v')) $$
+
+$$ P_q^{att}(v|v') = \frac{exp(R_q^{att}(v, v'))}{exp(R_q^{att}(v, v')) + \sum_{v^{''}} exp(R_q^{att}(v, v^{''})) } $$
+
+$$ R_q^{att}(v, v') = \eta Cos( g_{p}^{att}(v), \: \:  f_{p'}^{dst}(v'))$$
+
+# 算法伪码
+
+综合 $O_{rel}$ 和 $O_{att}$，算法伪码如下：
+
+![avatar](/images/计算广告/trigger/trigger-6.png)
+
+# ANN检索
+
+我们将所有ad节点的向量 $g_{p}^{att}(v)$ 存入ANN引擎。线上面对搜索请求时，我们提取搜索意图（query和item），查找对应向量，通过ANN引擎召回最近的K个候选广告。
+
+# 效果展示
+
+![avatar](/images/计算广告/trigger/trigger-7.png)
+
+如图所示，我们使用t-SNE对节点向量进行可视化。可以看到，相似的节点在低维空间上很好地进行了聚集；而且不同种类的节点也确实被投影到同一空间。
 
 
 
