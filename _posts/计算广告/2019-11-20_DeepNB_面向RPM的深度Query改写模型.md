@@ -15,7 +15,7 @@ tags:
 
 一个典型的搜索广告系统如下图所示。可以看到，QR模块处于广告系统的最前端，它决定了哪些广告能够被召回，因此对最终效果有着重要影响。本文将探讨在搜索直通车业务中如何设计面向RPM的深度QR算法。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-8.png)
 
 项目论文：AAAI 2020 <https://arxiv.org/abs/1910.12527>
 
@@ -30,7 +30,7 @@ tags:
   * Nodebidding将query看作一个不可分割的graph node，这是Nodebidding的一大特色，同时也有所限制了对query进行更加深入的理解。例如，“大码女装”和“胖mm衣服”从人类语义上讲是很接近的，而Nodebidding则是将两者作为独立的实体对待，难以将从其中一个身上学到的信息迁移到另一个上面。  
   * Nodebidding本质上是基于统计的记忆模型，所以要在长尾流量上面挖掘出置信度高的改写关系是相对困难的。而从图2可见，直通车场景下日PV不足50个的query占比高达90%，稀疏的数据影响了算法在长尾上的精度；而大盘有30%的PV来自于这些长尾query，具有较高的商业价值；同时，长尾query目前覆盖了全库67.2%的广告，优化长尾query的表现对效果具有可观的收益。
   
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-9.png)
 
   * Nodebidding对流量的切分粒度是搜索词粒度，而随着个性化算法的发展，我们迫切需要对流量的进行更加精细化的耕作。
 
@@ -42,7 +42,7 @@ tags:
 
 DeepNB通过深度网络将query和bidword映射为同一隐式空间中的向量，将bidword的改写概率转化为两个向量之间的距离计算。在对query进行embedding时，DeepNB不再将其局限为搜索词，而是引入了丰富的特征维度，并纳入了user的信息，提升了模型对query理解的泛化能力和精细程度，改善了模型在长尾query上的表现。在bidword侧，DeepNB设计了面向RPM的样本构造方法，使得高RPM潜力的bidword能以更大的概率被改写出来，近似实现对优质广告集的最大图覆盖。下面几节将做详细介绍。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-10.png)
 
 ### Query侧的网络结构
 
@@ -50,7 +50,7 @@ DeepNB通过深度网络将query和bidword映射为同一隐式空间中的向�
 
 DeepNB的query侧网络有三类输入特征，分别是：query分词后的term特征、query归一化后的id、用户profile。query分词后，首先对term list进行embedding，然后将embedding向量通过Attention Based CNN网络。这里试图利用CNN网络在捕捉局部组合特征上的优秀能力来实现n-gram效果。在pooling层加入Attention机制，因为我们发现在淘宝搜索场景下，用户的搜索词大部分是“属性+商品名”这样的组合，属性词能精确地表达了用户个性需求，而在圈定类目后商品名所携带的信息就大为减少，所以在改写时需要通过注意力机制来给予不同的词以不同的权重。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-11.png)
 
 我们同时加入了对top query进行id化之后的embeddding向量，以此增强模型在头部流量上的记忆能力。
 
@@ -70,15 +70,15 @@ DeepNB在bidword侧没有设计泛化特征，而是在id化后直接将其映�
 
 * 第一种是将激活的bidword全部作为正例。这种方式简单直观，但会导致训练样本的急剧膨胀。假如每天的点击数据量在5亿，每个广告平均购买bidword有200个，那么，一天的训练样本就有千亿级别。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-12.png)
 
 * 第二种是只使用当次召回的bidword作为正例。在线上环境中，广告的每一次展现都是被某个bidword召回的，所以我们可以只选择当次bidword作为正例。这种方式克服了第一种方式的样本爆炸的缺陷，缺点是可能会使算法陷入自循环，加剧马太效应。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-13.png)
 
 * 第三种方式是在激活的bidword中根据某种采样算法挑选有限几个bidword作为正例。这种方法大大减少了样本量级，同时缓解了马太效应。采样算法需要设计合理，不然会严重影响效果。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-14.png)
 
 DeepNB采用了第三种方式，并设计了面向RPM的采样算法。
 
@@ -123,11 +123,11 @@ $$ p(b_i | q) \: \infty \: QR_RPM(b_i, q) $$
 
 对于负样本的构造，我们借鉴了“课程学习(curriculum learning)”的思想，给模型喂给不同分类难度的负样本。以类目是否相同为easy negative的判别标准，以 $q = 1 - p(b_i \| a, q)$ 值作为hard negative的判断指标。在训练模型时，先学习easy negative，然后再使用hard negative。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-15.png)
 
 下面以一个示例来说明DeepNB正负bidword的采样算法。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-16.png)
 
 ## 模型训练
 
@@ -145,7 +145,7 @@ $$ L(\Lambda) = -log \prod_{q, b^{+}} \: \frac{ exp(\gamma cos(q, b^{+}))  }{ \s
 
 对于非头部300W的query，我们需要进行实时向量inference和向量距离计算。在线请求到来时，首先依次调用特征生成（Feature Generator）和特征转换（Feature Transformer）模块，得到query的可输入模型的特征。然后调用online model inference模块（Prophet）计算出query的向量。接着用query向量去向量近邻检索模块（ANN）获取近邻bidword，并依据向量距离进行排序，截取topN。最后由广告倒排检索模块召回广告给后续的排序阶段。
 
-![avatar](/images/trigger/trigger-1.png)
+![avatar](/images/trigger/trigger-17.png)
 
 # 参考文献
 
