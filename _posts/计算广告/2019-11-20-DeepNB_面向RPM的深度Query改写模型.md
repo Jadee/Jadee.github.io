@@ -84,19 +84,19 @@ DeepNB采用了第三种方式，并设计了面向RPM的采样算法。
 
 设竞价词 $b_i$ 下挂载的广告数量为 $n_{b_i}$，广告 $a$ 在 $b_i$ 上的出价为 $price(b_i \| a)$，那么对每条点击样本<q, a>，竞价词 $b_i$ 被采样为正例的得分为：
 
-$$ score(b_i |a, q) = \frac{price(b_i | a)}{log(n_{b_i} + 1)} \tag(1)$$
+$$ score(b_i |a, q) = \frac{price(b_i | a)}{log(n_{b_i} + 1)} \tag{1}$$
 
 然后我们对广告 $a$ 购买的所有 bidword 的 score 进行归一化，得到最终的正例 label 传播概率：
 
-$$ p(b_i |a, q) = \frac{score(b_i |a, q)}{\sum_{b_k \in B(A)} score(b_k |a, q) } \tag(2)$$
+$$ p(b_i |a, q) = \frac{score(b_i |a, q)}{\sum_{b_k \in B(A)} score(b_k |a, q) } \tag{2}$$
 
-我们根据正例label传播概率采样m（10>=m>=1）个bidword作为正例，将每条点击样本扩展m倍。
+我们根据正例label传播概率采样 $m(10 \\, \geq m \geq \\, 1)$ 个bidword作为正例，将每条点击样本扩展m倍。
 
 可以证明，按照上述采样方法构造的样本能使得query改写出bidword的概率（也就是向量距离）与RPM是正相关的。这里做一简要说明。
 
 对于 $<q, b_i>$ 的改写端RPM，可以有如下推导：
 
-$$ \begin{align} QR_RPM(b_i, q) & = \frac{revenue(q, b_i)}{request(q)} \\
+$$ \begin{align} QR\_RPM(b_i, q) & = \frac{revenue(q, b_i)}{request(q)} \\
 & = \frac{\sum_{j=1}^{n_{b_i}} \: price(b_i | a_j) * click(a_j|q) }{  request(q) } \\
 & = \sum_{j=1}^{n_{b_i}} \: price(b_i | a_j) * \frac{click(a_j|q)}{request(q) } \\
 & = u(q) * \sum_{j=1}^{n_{b_i}} \: price(b_i | a_j) * \frac{click(a_j|q)}{click(q) }
@@ -109,13 +109,13 @@ $$
 
 $$ \begin{align} p(b_i | q) & = \sum_{j=1}^{n_{b_i}} \: p(b_i | a_j, q) * p(a_j | q)  \\
 & \infty \sum_{j=1}^{n_{b_i}} \: price(b_i | a_j) * \frac{click(a_j|q)}{click(q) } \\
-& = \frac{1}{u(q)} * QR_RPM(b_i, q) 
+& = \frac{1}{u(q)} * QR\_RPM(b_i, q) 
 \end{align}
 $$
 
 也就是得到了：
 
-$$ p(b_i | q) \: \infty \: QR_RPM(b_i, q) $$ 
+$$ p(b_i | q) \: \infty \: QR\_RPM(b_i, q) $$ 
 
 这个式子的物理含义是：q 被改写为 $b_i$ 的概率正比于 $b_i$ 在 q 下的期望RPM，反比于 $b_i$ 挂载的广告数量。之所以加上广告数量因子，是因为我们希望在相同RPM潜力的情况下，让模型更倾向于选择不那么热门的bidword，使得广告竞争更加均衡。
 
